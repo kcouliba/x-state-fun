@@ -30,6 +30,8 @@ describe('repairBotMachine', () => {
     .withConfig(config)
     .withContext(context)
 
+  console.log('sooo.....', { machine })
+
   test('has initial state idle', () => {
     const expectedState = new State('idle')
 
@@ -37,7 +39,7 @@ describe('repairBotMachine', () => {
   })
 
   describe('on idle state entry', () => {
-    test('should trigger resetTries action', () => {
+    test.only('should trigger resetTries action', () => {
       expectActionsOnState(['resetTries'], machine.initialState)
     })
   })

@@ -15,7 +15,7 @@ const PARAMS = {
   max_tries: 3,
 }
 const OPTIONS = {
-  debug: true,
+  debug: false,
 }
 
 /**
@@ -28,9 +28,17 @@ class RepairBot {
    * @param {Object} options
    */
   constructor(params = PARAMS, options = {}) {
+    // const actions = {
+    //   resetTries: () => (...args) => (console.log(args)),
+    //   // resetTries: assign({ repairTriesCount: 0 }),
+    //   incRepairTries: () => assign({
+    //     repairTriesCount: ctx => (console.log({ctx}), ctx.repairTriesCount + 1),
+    //   }),
+    //   notifyFailure: () => console.log('notify failure'),
+    // }
     const actions = {
       // resetTries: () => console.log('resetTries'),
-      resetTries: () => assign({ repairTriesCount: 0 }),
+      resetTries: assign({ repairTriesCount: () => 0 }),
       incRepairTries: assign({
         repairTriesCount: ctx => ctx.repairTriesCount + 1,
       }),
@@ -77,18 +85,24 @@ class RepairBot {
 
   isAvailable() {
     const isAvailable = this.interpreter.state.value === 'idle'
-    console.log(`repair bot is ${isAvailable ? '\u{1F199}' : '\u{1F6AB} not'} available`)
+    console.log(
+      `repair bot is ${isAvailable ? '\u{1F199}' : '\u{1F6AB} not'} available`
+    )
     return isAvailable
   }
 
-  goFix(/* something, somewhere */) {
+  goFix() {
     console.log('repair bot on the move to fixing \u{1F697}')
     this.interpreter.send('MOVE')
+  }
+
+  landToFixPlace() {
+    console.log('repair bot landed on place for fixing \u{1F681}')
     this.interpreter.send('LAND')
   }
 
   investigate() {
-    console.log('repair not investigating \u{2753}')
+    console.log('repair bot is investigating \u{2753}')
     this.interpreter.send('DIAGNOSE')
   }
 
@@ -107,10 +121,19 @@ class RepairBot {
 const repairBot = new RepairBot()
 
 repairBot.start()
-repairBot.isAvailable()
-repairBot.goFix(/* something, somewhere */)
-repairBot.isAvailable()
-repairBot.investigate()
-repairBot.fix()
+// repairBot.isAvailable()
+// repairBot.goFix()
+// repairBot.landToFixPlace()
+// repairBot.isAvailable()
+// repairBot.investigate()
+// repairBot.fix()
+// repairBot.investigate()
+// repairBot.fix()
+// repairBot.investigate()
+// repairBot.fix()
+// repairBot.investigate()
+// repairBot.fix()
+// repairBot.investigate()
+// repairBot.fix()
 repairBot.stop()
 module.exports = RepairBot
