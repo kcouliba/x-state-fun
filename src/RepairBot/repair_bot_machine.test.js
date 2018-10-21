@@ -2,7 +2,6 @@ const {
   Machine,
   State,
   matchesState,
-  actions: { assign },
 } = require('xstate')
 const REPAIR_BOT_MACHINE_GRAPH = require('./repair_bot_machine_graph.json')
 const MAX_TRIES = 3
@@ -11,11 +10,11 @@ const {
 } = require('../../utils')
 const config = {
   actions: {
-    resetTries: assign({ repairTriesCount: 0 }),
-    incRepairTries: assign(ctx => ({
-      repairTriesCount: ctx.repairTriesCount + 1,
-    })),
-    notifyFailure: () => console.log('notify failure'),
+    resetTries: () => ({ repairTriesCount: () => 0 }),
+    incRepairTries: () => ({
+      repairTriesCount: ctx => ctx.repairTriesCount + 1,
+    }),
+    notifyFailure: () => console.log('notifyFailure', 'notify failure'),
   },
   guards: {
     canTryToRepair: extState => extState.repairTriesCount < MAX_TRIES,
