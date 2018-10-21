@@ -31,8 +31,6 @@ function expectTransitionSucceeds(fromState, toState, byEvent, machine) {
  * @param {State} state
  */
 function expectActionsOnState(actions, state) {
-  expect(actions).not.toHaveLength(0)
-  expect(state.actions).not.toHaveLength(0)
   const hasExpectedActions = actions.reduce((acc, action) => {
     return acc && state.actions.some(({ type }) => type === action)
   }, true)
