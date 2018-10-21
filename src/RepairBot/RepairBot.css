@@ -1,0 +1,41 @@
+.repair_bot {
+  width: 100px;
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bot-image {
+  width: 100%;
+}
+
+.bot-status {
+  text-align: center;
+}
+/*
+.light-red {
+  opacity: 0.3;
+  color: red;
+}
+
+.light-yellow {
+  opacity: 0.3;
+  color: yellow;
+}
+
+.light-green {
+  opacity: 0.3;
+  color: green;
+}
+
+.active {
+  opacity: 1;
+}
+
+.outage .light-yellow {
+  opacity: 1;
+}
+
+.warning {
+  color: #bea030;
+} */

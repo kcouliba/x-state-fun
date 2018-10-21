@@ -22,6 +22,33 @@
   color: #61dafb;
 }
 
+.control-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.light-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.bot-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* .light {
+  width: 120px;
+  margin: 10px;
+}
+
+.bot {
+  width: 120px;
+  margin: 10px;
+} */
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

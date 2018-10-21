@@ -1,0 +1,39 @@
+.traffic-light {
+  width: 100px;
+  margin: 5px;
+}
+
+.traffic {
+  border: 1px #dfd3d3 solid;
+}
+
+.pedestrian {
+  text-align: center;
+}
+
+.light-red {
+  opacity: 0.3;
+  color: red;
+}
+
+.light-yellow {
+  opacity: 0.3;
+  color: yellow;
+}
+
+.light-green {
+  opacity: 0.3;
+  color: green;
+}
+
+.active {
+  opacity: 1;
+}
+
+.outage .light-yellow {
+  opacity: 1;
+}
+
+.warning {
+  color: #bea030;
+}
