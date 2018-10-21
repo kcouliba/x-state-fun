@@ -11,7 +11,7 @@ class LightRoad extends Component {
       onBlink: this.onBlink.bind(this),
       onOutage: this.onOutage.bind(this),
       onTick: this.updateLightState.bind(this),
-      outageChance: Math.ceil(Math.round(Math.random() * 95)),
+      outageChance: Math.ceil(Math.round(Math.random() * 5)),
       timer,
     })
     this.state = { trafficLight }
