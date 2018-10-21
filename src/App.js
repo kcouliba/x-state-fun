@@ -4,11 +4,26 @@ import RepairBot from './RepairBot'
 import './App.css'
 
 const trafficLights = [
-  { timer: { red: 1000, yellow: 1000, green: 1000 } },
-  { timer: { red: 2000, yellow: 1000, green: 2000 } },
-  { timer: { red: 3000, yellow: 2000, green: 5000 } },
+  { timer: { red: 1000, yellow: 1000, green: 2000 } },
+  // { timer: { red: 2000, yellow: 1000, green: 4000 } },
+  // { timer: { red: 3000, yellow: 2000, green: 6000 } },
+  // { timer: { red: 4000, yellow: 2000, green: 8000 } },
+  // { timer: { red: 5000, yellow: 3000, green: 10000 } },
+  // { timer: { red: 6000, yellow: 3000, green: 12000 } },
+  // { timer: { red: 1000, yellow: 1000, green: 2000 } },
+  // { timer: { red: 2000, yellow: 1000, green: 4000 } },
+  // { timer: { red: 3000, yellow: 2000, green: 6000 } },
+  // { timer: { red: 4000, yellow: 2000, green: 8000 } },
+  // { timer: { red: 5000, yellow: 3000, green: 10000 } },
+  // { timer: { red: 6000, yellow: 3000, green: 12000 } },
+  // { timer: { red: 1000, yellow: 1000, green: 2000 } },
+  // { timer: { red: 2000, yellow: 1000, green: 4000 } },
+  // { timer: { red: 3000, yellow: 2000, green: 6000 } },
+  // { timer: { red: 4000, yellow: 2000, green: 8000 } },
+  // { timer: { red: 5000, yellow: 3000, green: 10000 } },
+  // { timer: { red: 6000, yellow: 3000, green: 12000 } },
 ]
-const botCount = 2
+const botCount = Math.ceil(trafficLights.length / 4)
 
 class App extends Component {
   state = {

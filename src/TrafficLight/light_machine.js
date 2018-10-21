@@ -1,31 +1,21 @@
-/**
- * Actions / Transitions priority order
- * 1. stateNode.onExit (before any onEntry)
- * 2. transition.actions (before onEntry but after onExit)
- * 3. stateNode.onEntry last executed
- */
 import { Machine } from 'xstate'
 import { interpret } from 'xstate/lib/interpreter'
 import LIGHT_MACHINE_GRAPH from './traffic_light_machine_graph.json'
 const TIMER = 1000
 
 const PARAMS = {
-  outageChance: 2,
+  outageChance: 1,
   maxAllowedOutageCount: Infinity,
-  onOutage: () => {
-    console.log('traffic light on outage')
-  },
-  timer: {
-    red: 2000,
-    yellow: 1000,
-    green: 3000,
-  },
+  onBlink: () => console.log('yellow light blinking'),
+  onOutage: () => console.log('traffic light on outage'),
+  timer: { red: 2000, yellow: 1000, green: 4000 },
 }
 
 const OPTIONS = {
   timer: TIMER,
   noOutage: false,
   debug: false,
+  // debug: process.env.NODE_ENV !== 'production',
 }
 
 /**
@@ -38,27 +28,17 @@ class TrafficLight {
    *  @prop {Function} onOutage
    * @param {Object} options
    */
-  constructor(params = PARAMS, options = {}) {
-    const actions = {}
-    const context = {}
+  constructor(params = {}, options = {}) {
+    this.params = { ...PARAMS, ...params }
+    this.options = { ...OPTIONS, ...options }
     const activities = {
       warnOutage: this.warnOutage.bind(this),
       blinkYellowLight: this.blinkYellowLight.bind(this),
     }
+    const lightMachine = Machine(LIGHT_MACHINE_GRAPH, { activities })
 
-    this.params = { ...PARAMS, ...params }
-    this.options = { ...OPTIONS, ...options }
-    this.lightMachine = Machine(
-      LIGHT_MACHINE_GRAPH,
-      {
-        actions,
-        activities,
-        /* guards, services */
-      },
-      context
-    )
-    this.interpreter = interpret(this.lightMachine)
-    this.currentState = this.lightMachine.initialState
+    this.interpreter = interpret(lightMachine)
+    this.currentState = lightMachine.initialState
     this.ticker = null
     this.started = false
     this._tick = 0
@@ -70,32 +50,28 @@ class TrafficLight {
     }
   }
 
-  getCurrentColorState() {
-    const currentStateValue = this.currentState.value
-    if (this._powerOutage) {
-      return {
-        outage: true,
-        traffic: 'yellow',
-        pedestrian: 'wait',
-      }
-    }
-    if (typeof currentStateValue === 'object') {
-      return {
-        outage: false,
-        traffic: 'red',
-        pedestrian: currentStateValue.red,
-      }
-    }
+  getCurrentState() {
+    const {
+      currentState: { value: currentStateValue },
+      _powerOutage,
+    } = this
 
     return {
-      outage: false,
-      traffic: currentStateValue,
-      pedestrian: 'stop',
+      outage: _powerOutage,
+      traffic: {
+        red: !!currentStateValue.red,
+        yellow: currentStateValue === 'yellow',
+        green: currentStateValue === 'green',
+      },
+      pedestrian: {
+        walk: currentStateValue.red === 'walk',
+        wait: currentStateValue.red === 'wait',
+        stop: currentStateValue.red ? currentStateValue.red === 'stop' : true,
+      },
     }
   }
 
   fix() {
-    console.log('light repaired \u{1F4AA}')
     if (this._powerOutage) {
       this._powerOutage = false
       return this.interpreter.send('POWER_RESTORE')
@@ -106,14 +82,9 @@ class TrafficLight {
     this.interpreter.start()
     this.ticker = setInterval(this._onTick.bind(this), this.options.timer)
     this.started = true
-    console.log('traffic light started \u{1F6A6}')
   }
 
   stop() {
-    console.log(
-      'stopping road light. power outages: %s \u{1F51A}',
-      this._powerOutageCount
-    )
     clearInterval(this.ticker)
     this.ticker = null
     this.started = false
@@ -121,25 +92,18 @@ class TrafficLight {
   }
 
   blinkYellowLight() {
-    const call = setInterval(() => {
-      console.log('yellow light blinking \u{26A0}')
-    }, 1000)
-    return () => {
-      console.log('stop yellow light blinking')
-      clearInterval(call)
-    }
+    const call = setInterval(() => this.params.onBlink(), 1000)
+    return () => clearInterval(call)
   }
 
   warnOutage() {
     this.params.onOutage(this)
-    const call = setInterval(() => {
-      this.params.onOutage(this)
-    }, 5000)
+    const call = setInterval(() => this.params.onOutage(this), 5000)
     return () => clearInterval(call)
   }
 
-  _log() {
-    console.log('[DEBUG]\ttraffic light state', this.getCurrentColorState())
+  _log(nextState) {
+    console.log('[DEBUG]\ttraffic light state is', JSON.stringify(nextState))
   }
 
   _onTick() {
@@ -150,13 +114,13 @@ class TrafficLight {
       this.stop()
     }
     if (this._powerOutage) {
-      params.onTick && params.onTick(this.getCurrentColorState())
+      params.onTick && params.onTick(this.getCurrentState())
       return
     }
     if (!options.noOutage && outaged) {
       ++this._powerOutageCount
       this._powerOutage = true
-      params.onTick && params.onTick(this.getCurrentColorState())
+      params.onTick && params.onTick(this.getCurrentState())
       return this.interpreter.send('POWER_OUTAGE')
     }
     ++this._tick
@@ -178,7 +142,7 @@ class TrafficLight {
         this._tick = 0
       }
     }
-    params.onTick && params.onTick(this.getCurrentColorState())
+    params.onTick && params.onTick(this.getCurrentState())
   }
 }
 

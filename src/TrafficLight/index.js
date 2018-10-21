@@ -8,9 +8,10 @@ class LightRoad extends Component {
     const { timer } = props
 
     const trafficLight = new TrafficLight({
-      outageChance: Math.ceil(Math.round(Math.random() * 50)),
+      onBlink: this.onBlink.bind(this),
       onOutage: this.onOutage.bind(this),
       onTick: this.updateLightState.bind(this),
+      outageChance: Math.ceil(Math.round(Math.random() * 95)),
       timer,
     })
     this.state = { trafficLight }
@@ -22,6 +23,13 @@ class LightRoad extends Component {
     trafficLight && trafficLight.start()
   }
 
+  onBlink() {
+    const { blinkOn = false } = this.state
+    this.setState({
+      blinkOn: !blinkOn,
+    })
+  }
+
   onOutage(light) {
     const { warnOutage } = this.props
 
@@ -29,42 +37,50 @@ class LightRoad extends Component {
   }
 
   updateLightState(lightState) {
-    this.setState({
-      outage: lightState.outage,
-      traffic: {
-        red: lightState.traffic === 'red',
-        yellow: lightState.traffic === 'yellow',
-        green: lightState.traffic === 'green',
-      },
-      pedestrian: {
-        stop: lightState.pedestrian === 'stop',
-        walk: lightState.pedestrian === 'walk',
-        wait: lightState.pedestrian === 'wait',
-      },
-    })
+    const { trafficLight } = this.state
+    this.setState(trafficLight.getCurrentState())
+  }
+
+  renderOutage() {
+    const { blinkOn } = this.state
+
+    return (
+      <div className="traffic-light outage">
+        <div className="traffic">
+          <p className="light-red">o</p>
+          <p className={`light-yellow ${blinkOn ? 'active' : ''}`}>o</p>
+          <p className="light-green">o</p>
+        </div>
+        <div className="pedestrian">
+          <p className="warning">{'\u{26A0}'}</p>
+        </div>
+      </div>
+    )
   }
 
   render() {
     const { trafficLight, traffic = {}, pedestrian = {}, outage } = this.state
+    const { red, yellow, green } = traffic
+    const { walk, wait, stop } = pedestrian
 
     if (!trafficLight) {
       return <p>Traffic light under maintenance... {'\u{1F6A7}'}</p>
     }
+    if (outage) {
+      return this.renderOutage()
+    }
     return (
-      <div className={`traffic-light ${outage ? 'outage' : ''}`}>
+      <div className="traffic-light">
         <div className="traffic">
-          <p className={`light-red ${traffic.red ? 'active' : ''}`}>o</p>
-          <p className={`light-yellow ${traffic.yellow ? 'active' : ''}`}>o</p>
-          <p className={`light-green ${traffic.green ? 'active' : ''}`}>o</p>
+          <p className={`light-red ${red ? 'active' : ''}`}>o</p>
+          <p className={`light-yellow ${yellow ? 'active' : ''}`}>o</p>
+          <p className={`light-green ${green ? 'active' : ''}`}>o</p>
         </div>
         <div className="pedestrian">
-          <p className={`light-red ${pedestrian.stop ? 'active' : ''}`}>STOP</p>
-          <p className={`light-yellow ${pedestrian.wait ? 'active' : ''}`}>
-            WAIT
-          </p>
-          <p className={`light-green ${pedestrian.walk ? 'active' : ''}`}>GO</p>
+          <p className={`light-red ${stop ? 'active' : ''}`}>STOP</p>
+          <p className={`light-yellow ${wait ? 'active' : ''}`}>WAIT</p>
+          <p className={`light-green ${walk ? 'active' : ''}`}>GO</p>
         </div>
-        {outage && <p className="warning">OUTAGE {'\u{26A0}'}</p>}
       </div>
     )
   }

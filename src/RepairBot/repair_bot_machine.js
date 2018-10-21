@@ -4,7 +4,7 @@ import REPAIR_BOT_MACHINE_GRAPH from './repair_bot_machine_graph.json'
 
 const { assign } = actions
 const PARAMS = {
-  max_tries: 3,
+  max_tries: Infinity,
 }
 const OPTIONS = {
   debug: false,
@@ -21,6 +21,8 @@ class RepairBot {
    * @param {Object} options
    */
   constructor(params = {}, options = {}) {
+    this.params = { ...PARAMS, ...params }
+    this.options = { ...OPTIONS, ...options }
     const actions = {
       resetTries: assign({ repairTriesCount: 0 }),
       incRepairTries: assign({
@@ -29,48 +31,23 @@ class RepairBot {
       notifyFailure: () => console.log('notifyFailure', 'notify failure'),
     }
     const guards = {
-      canTryToRepair: extState => extState.repairTriesCount < params.max_tries,
+      canTryToRepair: extState =>
+        extState.repairTriesCount < this.params.max_tries,
       cannotTryToRepair: extState =>
-        extState.repairTriesCount >= params.max_tries,
+        extState.repairTriesCount >= this.params.max_tries,
     }
     const repairBotMachine = Machine(REPAIR_BOT_MACHINE_GRAPH)
       .withConfig({ actions, guards })
       .withContext({ repairTriesCount: 0 })
 
-    this.params = { ...PARAMS, ...params }
-    this.options = { ...OPTIONS, ...options }
     this.interpreter = interpret(repairBotMachine)
-
     if (this.options.debug) {
-      this.interpreter.onTransition(this.log.bind(this))
+      this.interpreter.onTransition(this._log.bind(this))
     }
   }
 
-  log(nextState) {
-    let message
-
-    switch (nextState.value) {
-      case 'idle':
-        message = 'repair bot is ready \u{1F916}'
-        break
-      case 'moving':
-        message = 'repair bot is on the move \u{1F697}'
-        break
-      case 'inplace':
-        message = 'repair bot has landed \u{1F681}'
-        break
-      case 'diagnosing':
-        message = 'repair bot is investigating \u{2753}'
-        break
-      case 'repairing':
-        message = 'repair bot is fixing \u{1F6A7}'
-        break
-
-      default:
-        message = ''
-        break
-    }
-    console.log('[DEBUG]\t', message)
+  _log(nextState) {
+    console.log('[DEBUG]\trepair bot state is', JSON.stringify(nextState))
   }
 
   getCurrentState() {
