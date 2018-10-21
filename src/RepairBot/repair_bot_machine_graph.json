@@ -17,7 +17,7 @@
         },
         "CANNOT_REPAIR": {
           "target": "idle",
-          "actions": [{ "type": "notifyFailure" }],
+          "actions": ["notifyFailure"],
           "cond": "cannotTryToRepair"
         }
       }
