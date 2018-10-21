@@ -3,7 +3,7 @@
   "initial": "idle",
   "states": {
     "idle": {
-      "onEntry": "resetTries",
+      "actions": ["resetTries"],
       "on": { "MOVE": "moving" }
     },
     "moving": { "on": { "LAND": "inplace" } },
@@ -12,7 +12,7 @@
       "on": {
         "REPAIR": {
           "target": "repairing",
-          "actions": [{ "type": "incRepairTries" }],
+          "actions": ["incRepairTries"],
           "cond": "canTryToRepair"
         },
         "CANNOT_REPAIR": {

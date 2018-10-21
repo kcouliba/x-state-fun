@@ -8,13 +8,13 @@ const REPAIR_BOT_MACHINE_GRAPH = require('./repair_bot_machine_graph.json')
 const MAX_TRIES = 3
 const {
   testing: { expectTransitionSucceeds, expectActionsOnState },
-} = require('../utils')
+} = require('../../utils')
 const config = {
   actions: {
     resetTries: assign({ repairTriesCount: 0 }),
-    incRepairTries: assign({
-      repairTriesCount: ctx => ctx.repairTriesCount + 1,
-    }),
+    incRepairTries: assign(ctx => ({
+      repairTriesCount: ctx.repairTriesCount + 1,
+    })),
     notifyFailure: () => console.log('notify failure'),
   },
   guards: {
@@ -30,8 +30,6 @@ describe('repairBotMachine', () => {
     .withConfig(config)
     .withContext(context)
 
-  console.log('sooo.....', { machine })
-
   test('has initial state idle', () => {
     const expectedState = new State('idle')
 
@@ -39,7 +37,7 @@ describe('repairBotMachine', () => {
   })
 
   describe('on idle state entry', () => {
-    test.only('should trigger resetTries action', () => {
+    test('should trigger resetTries action', () => {
       expectActionsOnState(['resetTries'], machine.initialState)
     })
   })
