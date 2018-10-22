@@ -3,7 +3,7 @@
   "initial": "idle",
   "states": {
     "idle": {
-      "actions": ["resetTries"],
+      "onEntry": ["resetTries"],
       "on": { "MOVE": "moving" }
     },
     "moving": { "on": { "LAND": "inplace" } },

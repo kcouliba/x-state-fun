@@ -34,5 +34,5 @@ function expectActionsOnState(actions, state) {
   const hasExpectedActions = actions.reduce((acc, action) => {
     return acc && state.actions.some(({ type }) => type === action)
   }, true)
-  expect(hasExpectedActions).toBeTruthy()
+  expect(hasExpectedActions).toBe(true)
 }
